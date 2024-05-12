@@ -4,10 +4,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.movieappmad24.data.MovieRepository
 
-class MoviesViewModelFactory(private val repository: MovieRepository): ViewModelProvider.Factory {
+class MoviesViewModelFactory(private val repository: MovieRepository, private val Id: String): ViewModelProvider.Factory {
     override fun<T: ViewModel> create(modelClass: Class<T>): T {
-        if(modelClass.isAssignableFrom(MoviesViewModel::class.java)){
+        /*if(modelClass.isAssignableFrom(MoviesViewModel::class.java)){
             return MoviesViewModel(repository = repository) as T
+        }*/
+
+        if(modelClass.isAssignableFrom(DetailScreenViewModel::class.java))
+        {
+            return DetailScreenViewModel(repository = repository,Id ) as T
+        }
+        if(modelClass.isAssignableFrom(WatchlistScreenViewModel::class.java))
+        {
+            return WatchlistScreenViewModel(repository = repository) as T
+        }
+        if(modelClass.isAssignableFrom(HomeScreenViewModel::class.java)){
+            return HomeScreenViewModel(repository = repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

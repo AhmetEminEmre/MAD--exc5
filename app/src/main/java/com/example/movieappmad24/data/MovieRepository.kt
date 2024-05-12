@@ -1,6 +1,7 @@
 package com.example.movieappmad24.data
 
 import com.example.movieappmad24.models.Movie
+import com.example.movieappmad24.models.MovieWithImages
 import kotlinx.coroutines.flow.Flow
 
 class MovieRepository(private val movieDao: MovieDao) {
@@ -11,9 +12,6 @@ class MovieRepository(private val movieDao: MovieDao) {
 
     suspend fun deleteMovie(movie: Movie) = movieDao.delete(movie)
 
-    fun getAllMovies(): Flow<List<Movie>> = movieDao.getAll()
+    fun getAllMovies(): Flow<List<MovieWithImages>> = movieDao.getAll()
 
-    fun getFavoriteMovies(): Flow<List<Movie>> = movieDao.getFavorites()
-
-    fun getById(id: Long): Flow<Movie?> = movieDao.get(id)
 }

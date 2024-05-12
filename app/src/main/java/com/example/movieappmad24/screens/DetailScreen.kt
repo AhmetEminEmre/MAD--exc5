@@ -13,9 +13,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,55 +26,70 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
-import com.example.movieappmad24.viewmodels.MoviesViewModel
+import com.example.movieappmad24.data.MovieDatabase
+import com.example.movieappmad24.data.MovieRepository
+import com.example.movieappmad24.viewmodels.DetailScreenViewModel
+import com.example.movieappmad24.viewmodels.MoviesViewModelFactory
 import com.example.movieappmad24.widgets.HorizontalScrollableImageView
 import com.example.movieappmad24.widgets.MovieRow
 import com.example.movieappmad24.widgets.SimpleTopAppBar
 
 @Composable
 fun DetailScreen(
-    movieId: String?,
+    movieId: String,
     navController: NavController,
-    moviesViewModel: MoviesViewModel
 ) {
+    val db = MovieDatabase.getDatabase(LocalContext.current, rememberCoroutineScope())
+    val repository = MovieRepository(movieDao = db.movieDao())
+    val factory = MoviesViewModelFactory(repository, movieId)
+    val detailViewModel: DetailScreenViewModel = viewModel(factory = factory)
 
-    movieId?.let {
-        val movie = moviesViewModel.movies.filter { movie -> movie.id == movieId }[0]
+    movieId.let { id ->
+        val movie = detailViewModel.movies.collectAsState().value.firstOrNull { movie -> movie.movie.id == id }
 
 
         Scaffold (
             topBar = {
-                SimpleTopAppBar(title = movie.title) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Go back"
-                        )
+                if (movie != null) {
+                    SimpleTopAppBar(title = movie.movie.title) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Go back"
+                            )
+                        }
                     }
                 }
             }
         ){ innerPadding ->
             Column {
-                MovieRow(
-                    modifier = Modifier.padding(innerPadding),
-                    movie = movie,
-                    onFavoriteClick = { id -> moviesViewModel.toggleFavoriteMovie(id) }
+                if (movie != null) {
+                    MovieRow(
+                        modifier = Modifier.padding(innerPadding),
+                        movie = movie,
+                        onFavoriteClick = { id -> detailViewModel.toggleFavorite(movie.movie) }
                     )
+                }
 
                 Divider(modifier = Modifier.padding(4.dp))
 
                 Column {
                     Text("Movie Trailer")
-                    VideoPlayer(trailerURL = movie.trailer)
+                    if (movie != null) {
+                        VideoPlayer(trailerURL = movie.movie.trailer)
+                    }
                 }
 
                 Divider(modifier = Modifier.padding(4.dp))
 
-                HorizontalScrollableImageView(movie = movie)
+                if (movie != null) {
+                    HorizontalScrollableImageView(movie = movie.movie)
+                }
             }
         }
     }

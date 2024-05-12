@@ -6,12 +6,20 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.example.movieappmad24.models.Movie
+import com.example.movieappmad24.models.MovieImage
+import com.example.movieappmad24.models.MovieWithImages
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MovieDao {
     @Insert
     suspend fun add(movie: Movie)
+
+    @Insert
+    suspend fun addAll(movie: List<Movie>)
+
+    @Insert
+    suspend fun addImages(image: List<MovieImage>)
 
     @Update
     suspend fun update(movie: Movie)
@@ -22,8 +30,9 @@ interface MovieDao {
     @Query("SELECT * from movie where dbId=:id")
     fun get(id: Long): Flow<Movie>
 
+
     @Query("SELECT * from movie")
-    fun getAll(): Flow<List<Movie>>
+    fun getAll(): Flow<List<MovieWithImages>>
 
     @Query("SELECT * from movie where isFavorite= 1")
     fun getFavorites(): Flow<List<Movie>>

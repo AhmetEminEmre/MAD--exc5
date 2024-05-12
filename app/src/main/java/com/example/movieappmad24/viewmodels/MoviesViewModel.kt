@@ -1,19 +1,13 @@
 package com.example.movieappmad24.viewmodels
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.movieappmad24.data.MovieRepository
-import com.example.movieappmad24.models.Movie
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
+import com.example.movieappmad24.models.MovieWithImages
 
 // Inherit from ViewModel class
-class MoviesViewModel(
+/*class MoviesViewModel(
     private val repository: MovieRepository
 ) : ViewModel() {
+
+
     private val _movies = MutableStateFlow(listOf<Movie>())
     val movies: StateFlow<List<Movie>> = _movies.asStateFlow()
 
@@ -26,5 +20,15 @@ class MoviesViewModel(
                 }
         }
     }
+    fun toggleFavorite(movie: Movie) {
+        movie.isFavorite = !movie.isFavorite
+        viewModelScope.launch {
+            repository.updateMovie(movie)
+        }
+    }
+}*/
 
+interface MoviesViewModel {
+    //same usage in both classes, can use interface
+    fun toggleFavorite(movie: MovieWithImages)
 }
